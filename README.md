@@ -16,5 +16,5 @@ pip install -e .
 import gymnasium as gym
 import gym_crane
 
-env = gym.make('CarneWorld-v0', render_mode='human')
+env = gym.make('CraneWorld-v0', render_mode='human')
 ```

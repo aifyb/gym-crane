@@ -5,11 +5,10 @@ import pygame
 import numpy as np
 
 
-class CarneWorld(gym.Env):
+class CraneWorld(gym.Env):
     metadata = {'render_modes': ['human'], 'render_fps': 5}
 
     def __init__(self, render_mode=None):
-        # Define window size
         self.window_width = 800
         self.window_height = 600
 
@@ -40,16 +39,19 @@ class CarneWorld(gym.Env):
             'task_start': self.task_start,
             'task_end': self.task_end,
         }
-    
+
     def _get_info(self):
         return {}
-    
+
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
-        self.position = spaces.Box(low=0, high=self.window_width, shape=(1,), dtype=np.float32).sample()
-        self.task_start = spaces.Box(low=0, high=self.window_width, shape=(1,), dtype=np.float32).sample()
-        self.task_end = spaces.Box(low=0, high=self.window_width, shape=(1,), dtype=np.float32).sample()
+        self.position = spaces.Box(
+            low=0, high=self.window_width, shape=(1,), dtype=np.float32).sample()
+        self.task_start = spaces.Box(
+            low=0, high=self.window_width, shape=(1,), dtype=np.float32).sample()
+        self.task_end = spaces.Box(
+            low=0, high=self.window_width, shape=(1,), dtype=np.float32).sample()
 
         observation = self._get_obs()
         print(observation)
@@ -59,7 +61,6 @@ class CarneWorld(gym.Env):
             self._render_frame()
 
         return observation, info
-    
 
     def step(self, action):
         direction = self._action_to_direction[action]
@@ -70,13 +71,13 @@ class CarneWorld(gym.Env):
         info = self._get_info()
 
         terminated = np.array_equal(self.position, self.task_end)
-        reward = 1 if terminated else 0 
+        reward = 1 if terminated else 0
 
         if self.render_mode == 'human':
             self._render_frame()
 
         return observation, reward, terminated, False, info
-    
+
     def render(self):
         if self.render_mode == 'human':
             mode = self._render_frame()
@@ -84,22 +85,25 @@ class CarneWorld(gym.Env):
     def _render_frame(self):
         if self.window is None:
             pygame.init()
-            self.window = pygame.display.set_mode((self.window_width, self.window_height))
+            self.window = pygame.display.set_mode(
+                (self.window_width, self.window_height))
             self.clock = pygame.time.Clock()
 
         self.window.fill((255, 255, 255))
 
+        
+        pygame.draw.line(self.window, (0, 0, 0), (0, self.window_height/2-35),
+                         (self.window_width, self.window_height/2-35), 3)
+        pygame.draw.line(self.window, (0, 0, 0), (0, self.window_height/2+35),
+                         (self.window_width, self.window_height/2+35), 3)
 
-        # 中心位置绘制单轨行车道
-        pygame.draw.line(self.window, (0, 0, 0), (0, self.window_height/2-35), (self.window_width, self.window_height/2-35), 3)
-        pygame.draw.line(self.window, (0, 0, 0), (0, self.window_height/2+35), (self.window_width, self.window_height/2+35), 3)
-
-        # 根据task_start 绘制任务起点
-        pygame.draw.line(self.window, (255, 0, 0), (self.task_start.item(), self.window_height/2-35), (self.task_start.item(), self.window_height/2+35), 3)
-        # 根据task_end 绘制任务终点
-        pygame.draw.line(self.window, (0, 255, 0), (self.task_end.item(), self.window_height/2-35), (self.task_end.item(), self.window_height/2+35), 3)
-        # 根据position 绘制行车位置
-        pygame.draw.line(self.window, (0, 0, 0), (self.position.item(), self.window_height/2-35), (self.position.item(), self.window_height/2+35), 3)
+        
+        pygame.draw.line(self.window, (255, 0, 0), (self.task_start.item(), \
+                    self.window_height/2-35), (self.task_start.item(), self.window_height/2+35), 3)
+        pygame.draw.line(self.window, (0, 255, 0), (self.task_end.item(), \
+                    self.window_height/2-35), (self.task_end.item(), self.window_height/2+35), 3)
+        pygame.draw.line(self.window, (0, 0, 0), (self.position.item(), \
+                    self.window_height/2-35), (self.position.item(), self.window_height/2+35), 3)
 
         pygame.display.flip()
         self.clock.tick(self.metadata['render_fps'])
