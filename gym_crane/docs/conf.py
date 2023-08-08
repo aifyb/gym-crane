@@ -1,0 +1,11 @@
+# 安全距离
+SAFE_DISTANCE = 6
+
+# 天车的数量
+CRANE_NUM = 2
+
+# 天车的速度
+CRANE_SPEED = 1
+
+WINDOW_WIDTH = 1080
+WINDOW_HEIGHT = 720
